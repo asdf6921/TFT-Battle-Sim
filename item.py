@@ -1,6 +1,5 @@
 from itemAbility import ItemAbility, ProtectorsVowAbility, RedemptionAbility, GuinsoosRagebladeAbility, IonicSparkAbility, SterakGageAbility, DragonClawAbility, GuardBreakerAbility, GargoylesStoneplateAbility, BrambleVestAbility, GiantSlayerAbility, SunfireCapeAbility, HandofJusticeAbility, EdgeofNightAbility, TitansResolveAbility
-from itemAbility import RunaansHurricaneAbility, BloodthirsterAbility, ArchangelsStaffAbility, EvenshroudAbility, NashorsToothAbility, MorellonomiconAbility, CrownguardAbility, AdaptiveHelmAbility, BlueBuffAbility, RedBuffAbility, LastWhisperAbility, SteadfastHeartAbility, QuickSilverAbility, StatikkShivAbility, HextechGunbladeAbility
-
+from itemAbility import BloodthirsterAbility, ArchangelsStaffAbility, EvenshroudAbility, NashorsToothAbility, MorellonomiconAbility, CrownguardAbility, AdaptiveHelmAbility, BlueBuffAbility, RedBuffAbility, LastWhisperAbility, SteadfastHeartAbility, QuickSilverAbility, StatikkShivAbility
 class Item:
     def __init__(self, name, ad=0, ap=0, armor=0, mr=0, speed=0, omni=0, hp = 0, dmgamp=0, mana=0, max_hp=0, unique=False, mana_regen=0, crit=0, dura=0, critdmg=0, abilityCrit=False, ability=ItemAbility):
         self.name = name  
@@ -84,7 +83,7 @@ class SunfireCape(Item):
         super().__init__("Sunfire Cape", armor=20, hp=150, max_hp=0.08, unique=True, ability=SunfireCapeAbility)
 class HandofJustice(Item):
     def __init__(self):
-        super().__init__("Hand of Justice", ad=0.15, ap=15, crit=0.2, mana=15, omni=0.12, ability=HandofJusticeAbility)
+        super().__init__("Hand of Justice", ad=0.3, ap=30, crit=0.2, mana=15, omni=0.12, ability=HandofJusticeAbility)
 class EdgeofNight(Item):
     def __init__(self):
         super().__init__("Edge of Night", ad=0.1, armor=20, ability=EdgeofNightAbility)
@@ -93,7 +92,7 @@ class TitansResolve(Item):
         super().__init__("Titan's Resolve", armor=20, speed=0.1, ability=TitansResolveAbility)
 class RunaansHurricane(Item):
     def __init__(self):
-        super().__init__("Runaan's Hurricane", ad=0.25, speed=0.1, mr=20, ability=RunaansHurricaneAbility)
+        super().__init__("Runaan's Hurricane", ad=0.25, speed=0.1, mr=20)
 class Bloodthirster(Item):
     def __init__(self):
         super().__init__("Bloodthirster", ad=0.15, ap=15, mr=20, omni=0.2, ability=BloodthirsterAbility)
@@ -132,7 +131,7 @@ class JeweledGauntlet(Item):
         super().__init__("Jeweled Gauntlet", ap=35, crit=0.35, critdmg=0.1)
 class SteadfastHeart(Item):
     def __init__(self):
-        super().__init__("Steadfast Heart", hp=200, armor=20, dura=0.08, crit=0.2, ability=SteadfastHeartAbility)
+        super().__init__("Steadfast Heart", hp=200, armor=20, dura=0.15, crit=0.2, ability=SteadfastHeartAbility)
 class QuickSilver(Item):
     def __init__(self):
         super().__init__("Quick Silver", speed=0.3, crit=0.2, mr=20, unique=True, ability=QuickSilverAbility)
@@ -147,7 +146,7 @@ class StatikkShiv(Item):
         super().__init__("Statikk Shiv", ap=15, speed=0.15, mana=15, ability=StatikkShivAbility)
 class HextechGunblade(Item):
     def __init__(self):
-        super().__init__("Hextech Gunblade", ad=0.2, ap=20, omni=0.15, ability=HextechGunbladeAbility)
+        super().__init__("Hextech Gunblade", ad=0.2, ap=20, omni=0.15)
 
 
 # Factory function to create items by name

@@ -1,4 +1,4 @@
-from grid import Grid
+from grid import Grid, hex_grid
 from character import Character
 
 class Board:
@@ -32,7 +32,29 @@ class Board:
             prefix = " " if r % 2 == 1 else ""
             row_str = prefix + " ".join([cell if cell else '.' for cell in self.board[r]])
             print(row_str)
+            
+    def get_lowest_percent_health_ally(self, character):
+        """Returns the ally with the lowest percentage HP on the same team as the given character."""
+        lowest_health_ally = None
+        lowest_hp_percent = float('inf')
 
+        for ally in self.character_positions.keys():
+            if ally.team == character.team and ally is not character:
+                hp_percent = ally.hp / ally.max_hp
+                if hp_percent < lowest_hp_percent:
+                    lowest_health_ally = ally
+                    lowest_hp_percent = hp_percent
+
+        return lowest_health_ally
+
+    def get_second_enemy(self, attacker, primary_target, exclude=set()):
+        """Finds a second enemy for Runaan's Hurricane, avoiding primary target and already attacked enemies."""
+        enemies = [
+            enemy for enemy in self.character_positions.keys()
+            if enemy.team != attacker.team and enemy is not primary_target and enemy not in exclude
+        ]
+        return min(enemies, key=lambda e: hex_grid.calculate_distance(attacker.position, e.position), default=None)
+    
     @staticmethod
     def combine_boards(board1, board2):
         combined_row = board1.rows + board2.rows

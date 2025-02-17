@@ -4,7 +4,7 @@ from grid import hex_grid
 import json
 
 class Character:
-    def __init__(self, name, ad, armor, mr, hp, speed, range, mana, max_mana, speed_multiplier=1, hp_multiplier=1, omni=0, star_lvl=1, ad_multiplier=1, position=None, team=None, ability=None, dmgAmp=1.0, cost=0, critDmg=1.4, critRate=0.25, dura=0, abilityCrit=False):
+    def __init__(self, name, ad, armor, mr, hp, speed, range, mana, max_mana, speed_multiplier=1, hp_multiplier=1, titanStacks=0, omni=0, star_lvl=1, ad_multiplier=1, position=None, team=None, ability=None, dmgAmp=1.0, cost=0, critDmg=1.4, critRate=0.25, dura=0, abilityCrit=False):
         self.name = name
         self.star_lvl = star_lvl
         self.ad = ad
@@ -24,6 +24,7 @@ class Character:
         self.dura = dura
         self.ad_multiplier = ad_multiplier
         self.attack_speed = 1
+        self.titanStacks=titanStacks
         self.team=team
         self.critDmg = critDmg
         self.critRate = critRate
@@ -130,10 +131,18 @@ class Character:
 
     
     # Function to take damage
-    def take_damage(self, damage, board):
+    def take_damage(self, attacker, damage, board):
         actual_dmg = damage * (1 - (self.armor) / (self.armor + 100))
         projected_hp = self.hp - (actual_dmg - self.shield)
-        self.use_item_ability(projectedHP=projected_hp)
+        hit = True
+        self.use_item_ability(projectedHP=projected_hp, hit=hit)
+        if attacker.omni != 0:
+            attacker.heal(actual_dmg * attacker.omni)
+        for item in attacker.items:
+            if item.name == "Hextech Gunblade":
+                ally = board.get_lowest_percent_health_ally(attacker)
+                if ally != None:
+                    ally.heal(actual_dmg * 0.2)
         if self.shield > 0:
             shield_damage = min(actual_dmg, self.shield)
             self.shield -= shield_damage
@@ -145,24 +154,40 @@ class Character:
             print(f"{self.name} takes {damage:.2f} damage but is reduced by {damage - actual_dmg}. {self.name}'s HP: {self.hp}")
 
     # Function to attack
-    def attack(self, board, time):
+    def attack(self, board, time, battle):
         target = self.find_closest_enemy(board)
+        # Specifically for runaans
+        attacked_enemies = set()
         self.attack_count += 1
         if target != None:
             distance = hex_grid.calculate_distance(self.position, target.position)
             if distance > self.range:
                 self.walk(target, board)
+                battle.schedule_event(battle.time + (1 / self.speed * self.speed_multiplier), "attack", self)
             else:
                 projectedHP = self.hp
                 attacked = True
-                self.use_item_ability(projectedHP=projectedHP, attacked=attacked)
+                targetHP = target.hp
+                self.use_item_ability(projectedHP=projectedHP, attacked=attacked, targetHP=targetHP, battle=battle, board=board)
                 crit = random.random() < self.critRate  # Determines if attack is a crit
                 damage = self.ad * self.ad_multiplier * (self.critDmg if crit else 1) * self.dmg_amp
+                for item in self.items:
+                    if item.name == "Runaan's Hurricane":
+                        enemy = board.get_second_enemy(self, target, exclude=attacked_enemies)
+                        if enemy:
+                            enemy.take_damage(self, 0.6 * damage, board)
+                            attacked_enemies.add(enemy)
                 print(f"{self.name} on team {self.team} attacks {target.name} on team {target.team} for {damage:.2f} damage {'(CRIT!)' if crit else ''} at time {time}")
-                target.take_damage(damage, board)
+                target.take_damage(self, damage, board)
                 self.mana += 10
+                battle.schedule_event(battle.time + (1 / self.speed * self.speed_multiplier), "attack", self)
                 #if self.mana >= self.max_mana:
                 #    self.use_ability(target, board)
+
+    #Function for healing
+    def heal(self, amount):
+        self.hp = min(self.max_hp, self.hp + amount)
+        print(f"{self} healed {amount}")
 
     # Function to use item ability
     def use_item_ability(self, **kwargs):
